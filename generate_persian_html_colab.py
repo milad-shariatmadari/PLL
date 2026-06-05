@@ -1,0 +1,1161 @@
+from pathlib import Path
+
+html = r"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Learn Persian through history, alphabet, sounds, grammar, vocabulary, stories, quizzes, and progress tracking.">
+  <meta name="theme-color" content="#7b3f00">
+  <title>Persian | فارسی</title>
+  <style>
+    :root {
+      --bg: #0d0b08;
+      --card: #17130d;
+      --ink: #f3ead7;
+      --muted: #c8b996;
+      --line: #3b2f1e;
+      --accent: #d7a84f;
+      --accent-2: #f1d28a;
+      --accent-3: #8f641f;
+      --good: #15803d;
+      --bad: #b91c1c;
+      --shadow: 0 18px 42px rgba(0, 0, 0, .42);
+    }
+    body.dark {
+      --bg: #f8f1df;
+      --card: #fffaf0;
+      --ink: #23190d;
+      --muted: #69573a;
+      --line: #d8c394;
+      --accent: #8a5c13;
+      --accent-2: #5f3f0d;
+      --accent-3: #c8942f;
+      --shadow: 0 12px 30px rgba(72, 48, 12, .16);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Tahoma, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(215, 168, 79, .18), transparent 32rem),
+        radial-gradient(circle at bottom right, rgba(143, 100, 31, .16), transparent 30rem),
+        linear-gradient(135deg, #070604 0%, var(--bg) 38%, #1b1409 100%);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    .fa {
+      direction: rtl;
+      font-family: "Vazirmatn", "Segoe UI", Tahoma, Arial, sans-serif;
+      line-height: 1.9;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: linear-gradient(135deg, rgba(7, 6, 4, .96), rgba(68, 45, 13, .94), rgba(12, 10, 7, .96));
+      color: #fff6dd;
+      border-bottom: 1px solid rgba(241, 210, 138, .32);
+      box-shadow: var(--shadow);
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 2px; font-size: clamp(1.45rem, 3vw, 2.1rem); }
+    .subtitle { margin: 0; opacity: .88; }
+    nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-top: 14px;
+    }
+    button {
+      font: inherit;
+      border: 0;
+      cursor: pointer;
+    }
+    .tab, .tool-btn {
+      min-height: 42px;
+      border-radius: 8px;
+      padding: 9px 13px;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+    .tab {
+      background: rgba(255, 255, 255, .14);
+      color: white;
+    }
+    .tab.active {
+      background: linear-gradient(180deg, #f4d58a, #b8842d);
+      color: #161007;
+    }
+    .tool-btn {
+      background: linear-gradient(180deg, #d9ac55, #8e621f);
+      color: #120d05;
+      border: 1px solid rgba(255, 236, 176, .35);
+    }
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 18px 40px;
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .section-title {
+      margin-bottom: 18px;
+      padding-left: 13px;
+      border-left: 5px solid var(--accent);
+      font-size: clamp(1.35rem, 2.6vw, 2rem);
+    }
+    .intro {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .box, .story, .quiz-box, .timeline-item {
+      background: var(--card);
+      border: 1px solid rgba(241, 210, 138, .22);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, .035), rgba(255, 255, 255, .008)),
+        var(--card);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      min-height: 230px;
+      perspective: 900px;
+    }
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 230px;
+      transition: transform .45s;
+      transform-style: preserve-3d;
+    }
+    .card.flip .card-inner { transform: rotateY(180deg); }
+    .front, .back {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      overflow: auto;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .01)),
+        var(--card);
+      box-shadow: var(--shadow);
+      backface-visibility: hidden;
+    }
+    .back { transform: rotateY(180deg); }
+    .letter { font-size: 4.8rem; }
+    .forms { font-size: 1.35rem; }
+    .small { color: var(--muted); font-size: .93rem; }
+    .note {
+      border-left: 4px solid var(--accent-2);
+      padding: 12px 14px;
+      background: color-mix(in srgb, var(--accent-2) 10%, var(--card));
+      border-radius: 8px;
+    }
+    .path {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .path-step {
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--accent);
+      border-radius: 8px;
+      background: var(--card);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .source-list a { color: var(--accent-2); font-weight: 700; }
+    .grammar-card p { margin-bottom: 8px; }
+    .controls {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin: 0 0 16px;
+    }
+    .search {
+      width: min(100%, 480px);
+      min-height: 42px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--card);
+      color: var(--ink);
+    }
+    .option {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--accent-2) 13%, var(--card));
+      color: var(--ink);
+      text-align: left;
+    }
+    .feedback.good { color: var(--good); }
+    .feedback.bad { color: var(--bad); }
+    .progress {
+      height: 16px;
+      background: color-mix(in srgb, var(--line) 70%, var(--card));
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+      transition: width .25s;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    pre {
+      overflow-x: auto;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--card);
+    }
+    footer {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 18px 40px;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="topbar">
+        <div>
+          <h1>Persian | فارسی</h1>
+          <p class="subtitle">Learn Persian through history, alphabet, grammar, vocabulary, stories, and quizzes.</p>
+        </div>
+        <button class="tool-btn" onclick="toggleDark()">Dark / روشن</button>
+      </div>
+      <nav id="tabs"></nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="home" class="panel active">
+      <h2 class="section-title">Welcome / خوش آمدید</h2>
+      <div class="intro">
+        <div class="box">
+          <h3>About Persian</h3>
+          <p>Persian belongs to the Iranian branch of the Indo-Iranian languages, within the Indo-European language family. Modern Persian is spoken mainly in Iran, Afghanistan, and Tajikistan, with related varieties known as Farsi, Dari, and Tajik.</p>
+        </div>
+        <div class="box fa">
+          <h3>درباره فارسی</h3>
+          <p>فارسی از شاخه زبان‌های ایرانی و خانواده هندواروپایی است. این زبان در ایران، افغانستان و تاجیکستان و در میان جوامع فارسی‌زبان جهان کاربرد دارد.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="history" class="panel">
+      <h2 class="section-title">History / تاریخ</h2>
+      <div class="timeline-item">
+        <h3>Language Family Tree</h3>
+        <pre>Indo-European
+└── Indo-Iranian
+    └── Iranian
+        ├── Old Persian
+        ├── Middle Persian
+        └── New Persian
+            ├── Iranian Persian
+            ├── Dari
+            └── Tajik</pre>
+      </div>
+      <br>
+      <div class="timeline-item">
+        <h3>Historical Periods</h3>
+        <table>
+          <tr><th>Period</th><th>Date</th><th>Main script</th></tr>
+          <tr><td>Old Persian</td><td>550-330 BCE</td><td>Cuneiform</td></tr>
+          <tr><td>Middle Persian</td><td>224-651 CE</td><td>Pahlavi</td></tr>
+          <tr><td>Early New Persian</td><td>800-1200 CE</td><td>Perso-Arabic</td></tr>
+          <tr><td>Classical Persian</td><td>1200-1800 CE</td><td>Perso-Arabic</td></tr>
+          <tr><td>Modern Persian</td><td>1800-present</td><td>Perso-Arabic</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="alphabet" class="panel">
+      <h2 class="section-title">Alphabet / الفبا</h2>
+      <div class="controls">
+        <input id="alphabetSearch" class="search" type="search" placeholder="Search letters / جست‌وجوی حرف و واژه">
+        <button class="tool-btn" onclick="reviewRandomCard('alphabetGrid')">Review / مرور</button>
+      </div>
+      <div id="alphabetGrid" class="grid"></div>
+    </section>
+
+    <section id="sounds" class="panel">
+      <h2 class="section-title">Sounds / آواها</h2>
+      <h3>Vowels</h3>
+      <div id="vowelGrid" class="grid"></div>
+      <br>
+      <h3>Common consonant sounds</h3>
+      <div id="consonantGrid" class="grid"></div>
+    </section>
+
+    <section id="grammar" class="panel">
+      <h2 class="section-title">Grammar / دستور</h2>
+      <div id="grammarGrid" class="grid"></div>
+    </section>
+
+    <section id="vocab" class="panel">
+      <h2 class="section-title">Vocabulary / واژگان</h2>
+      <div class="controls">
+        <button class="tool-btn" onclick="showVocabulary('elementary')">Elementary / پایه</button>
+        <button class="tool-btn" onclick="showVocabulary('intermediate')">Intermediate / میانی</button>
+        <button class="tool-btn" onclick="showVocabulary('advanced')">Advanced / پیشرفته</button>
+        <input id="vocabSearch" class="search" type="search" placeholder="Search vocabulary / جست‌وجوی واژه">
+      </div>
+      <div class="box">
+        <h3>Word of the Day / واژه روز</h3>
+        <div id="dailyWord"></div>
+      </div>
+      <br>
+      <div id="vocabGrid" class="grid"></div>
+    </section>
+
+    <section id="stories" class="panel">
+      <h2 class="section-title">Stories / داستان‌ها</h2>
+      <div class="controls">
+        <button class="tool-btn" onclick="loadStories('elementary')">Elementary / پایه</button>
+        <button class="tool-btn" onclick="loadStories('intermediate')">Intermediate / میانی</button>
+        <button class="tool-btn" onclick="loadStories('advanced')">Advanced / پیشرفته</button>
+      </div>
+      <div id="storyContainer"></div>
+    </section>
+
+    <section id="quiz" class="panel">
+      <h2 class="section-title">Quiz / آزمون</h2>
+      <div class="quiz-box">
+        <h3 id="questionText">Loading...</h3>
+        <div id="answersContainer"></div>
+        <p id="quizFeedback" class="feedback"></p>
+        <button class="tool-btn" onclick="nextQuestion()">Next / پرسش بعدی</button>
+      </div>
+    </section>
+
+    <section id="progress" class="panel">
+      <h2 class="section-title">Progress / پیشرفت</h2>
+      <div class="box">
+        <h3>XP</h3>
+        <p><span id="xpValue">0</span> XP</p>
+        <div class="progress"><div id="xpBar" class="fill"></div></div>
+        <br>
+        <h3>Quiz Score</h3>
+        <p><span id="scoreValue">0</span> / <span id="answeredValue">0</span></p>
+        <div class="controls">
+          <button class="tool-btn" onclick="exportProgress()">Export / خروجی</button>
+          <label class="tool-btn">Import / ورود <input type="file" accept="application/json" onchange="importProgress(event)" hidden></label>
+          <button class="tool-btn" onclick="resetProgress()">Reset / بازنشانی</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <strong>Persian.</strong>
+    <p>Created by Milad Shariatmadari. AI-assisted by ChatGPT. © 2026 Open Educational Resource.</p>
+  </footer>
+
+  <script>
+    const tabs = [
+      ["home", "Home / خانه"],
+      ["history", "History / تاریخ"],
+      ["alphabet", "Alphabet / الفبا"],
+      ["sounds", "Sounds / آواها"],
+      ["grammar", "Grammar / دستور"],
+      ["vocab", "Vocabulary / واژگان"],
+      ["stories", "Stories / داستان‌ها"],
+      ["quiz", "Quiz / آزمون"],
+      ["progress", "Progress / پیشرفت"]
+    ];
+
+    const alphabetData = [
+      ["ا", "Alef", "a / â", "آب", "âb", "water"], ["ب", "Be", "b", "برادر", "barâdar", "brother"],
+      ["پ", "Pe", "p", "پدر", "pedar", "father"], ["ت", "Te", "t", "توپ", "tup", "ball"],
+      ["ث", "Se", "s", "ثروت", "sarvat", "wealth"], ["ج", "Jim", "j", "جوان", "javân", "young"],
+      ["چ", "Che", "ch", "چای", "chây", "tea"], ["ح", "He", "h", "حال", "hâl", "condition"],
+      ["خ", "Khe", "kh", "خانه", "khâne", "house"], ["د", "Dal", "d", "دوست", "dust", "friend"],
+      ["ذ", "Zal", "z", "ذهن", "zehn", "mind"], ["ر", "Re", "r", "رنگ", "rang", "color"],
+      ["ز", "Ze", "z", "زمین", "zamin", "earth"], ["ژ", "Zhe", "zh", "ژاله", "zhâle", "dew"],
+      ["س", "Sin", "s", "سگ", "sag", "dog"], ["ش", "Shin", "sh", "شیر", "shir", "lion / milk"],
+      ["ص", "Sad", "s", "صبح", "sobh", "morning"], ["ض", "Zad", "z", "ضروری", "zaruri", "necessary"],
+      ["ط", "Ta", "t", "طلا", "talâ", "gold"], ["ظ", "Za", "z", "ظاهر", "zâher", "appearance"],
+      ["ع", "Ayn", "'", "عشق", "eshq", "love"], ["غ", "Gheyn", "gh", "غذا", "ghazâ", "food"],
+      ["ف", "Fe", "f", "فردا", "fardâ", "tomorrow"], ["ق", "Qaf", "q", "قلم", "qalam", "pen"],
+      ["ک", "Kaf", "k", "کتاب", "ketâb", "book"], ["گ", "Gaf", "g", "گل", "gol", "flower"],
+      ["ل", "Lam", "l", "لب", "lab", "lip"], ["م", "Mim", "m", "مادر", "mâdar", "mother"],
+      ["ن", "Nun", "n", "نان", "nân", "bread"], ["و", "Vav", "v / u / o", "ورزش", "varzesh", "sport"],
+      ["ه", "He", "h", "هوا", "havâ", "weather"], ["ی", "Ye", "y / i", "یار", "yâr", "friend"]
+    ];
+
+    const letterNamesFa = {
+      "ا": "الف", "ب": "بِ", "پ": "پِ", "ت": "تِ", "ث": "ثِ", "ج": "جیم", "چ": "چِ", "ح": "حِ", "خ": "خِ",
+      "د": "دال", "ذ": "ذال", "ر": "رِ", "ز": "زِ", "ژ": "ژِ", "س": "سین", "ش": "شین", "ص": "صاد", "ض": "ضاد",
+      "ط": "طا", "ظ": "ظا", "ع": "عین", "غ": "غین", "ف": "فِ", "ق": "قاف", "ک": "کاف", "گ": "گاف", "ل": "لام",
+      "م": "میم", "ن": "نون", "و": "واو", "ه": "هِ", "ی": "یِ"
+    };
+
+    const letterSoundNotes = {
+      "ا": "Carrier for vowels; in آ it represents long â as in آب.",
+      "ث": "In modern Persian, ث is pronounced /s/, the same as س and ص.",
+      "ح": "In modern Persian, ح is usually pronounced /h/, the same as ه.",
+      "ذ": "In modern Persian, ذ is pronounced /z/, the same as ز، ض، ظ.",
+      "ص": "In modern Persian, ص is pronounced /s/, the same as س and ث.",
+      "ض": "In modern Persian, ض is pronounced /z/, the same as ز، ذ، ظ.",
+      "ط": "In modern Persian, ط is pronounced /t/, the same as ت.",
+      "ظ": "In modern Persian, ظ is pronounced /z/, the same as ز، ذ، ض.",
+      "ع": "In Iranian Persian, ع is often a glottal break or affects the vowel rather than an Arabic-style pharyngeal sound.",
+      "غ": "In much Iranian Persian, غ and ق are both pronounced as a voiced uvular/velar sound, though regional varieties differ.",
+      "ق": "In much Iranian Persian, ق and غ are close or identical; Dari and some regional accents may distinguish them more.",
+      "و": "و can be /v/ as in ورزش, or a vowel-like sound /u/ or /o/ in some words.",
+      "ی": "ی can be /y/ as in یار or the long vowel /i/ as in سیب."
+    };
+
+    const vowels = [
+      ["â / آ", "/ɒː/", "آب", "âb", "Long â. Keep it open and back; do not pronounce it like English ay."],
+      ["a / ـَ", "/æ/", "اسب", "asb", "Short a. Usually not written in normal Persian text."],
+      ["e / ـِ", "/e/", "دل", "del", "Short e. Usually not written; learners must know it from vocabulary."],
+      ["i / ی", "/iː/", "سیب", "sib", "Long i, close to ee in see."],
+      ["o / ـُ", "/o/", "تو", "to", "Short o. Usually not written in ordinary text."],
+      ["u / و", "/uː/", "دور", "dur", "Long u, close to oo in moon."]
+    ];
+
+    const consonants = [
+      ["kh / خ", "/x/", "خانه", "khâne", "A voiceless velar/uvular fricative, like a stronger h from the back of the mouth."],
+      ["gh / غ، ق", "/ɣ/ or /ɢ~q/", "غذا", "ghazâ", "In much Iranian Persian, غ and ق are close or identical; Dari and regional accents may differ."],
+      ["ch / چ", "/tʃ/", "چای", "chây", "Like ch in chair."],
+      ["sh / ش", "/ʃ/", "شیر", "shir", "Like sh in shoe."],
+      ["zh / ژ", "/ʒ/", "ژاله", "zhâle", "Like s in measure."],
+      ["r / ر", "/ɾ/ or /r/", "رنگ", "rang", "Usually a tap or trill, not the English r."],
+      ["s / س، ث، ص", "/s/", "سفر", "safar", "These three letters normally share the same /s/ sound in modern Persian."],
+      ["z / ز، ذ، ض، ظ", "/z/", "زمین", "zamin", "These four letters normally share the same /z/ sound in modern Persian."],
+      ["t / ت، ط", "/t/", "توپ", "tup", "Both letters are pronounced /t/ in modern Persian."],
+      ["h / ه، ح", "/h/", "هوا", "havâ", "Both letters are pronounced /h/ in modern Persian."]
+    ];
+
+    const grammar = [
+      ["Sentence order", "Persian usually uses subject-object-verb order.", "من کتاب می‌خوانم.", "man ketâb mikhânam"],
+      ["Plural", "The common plural suffix is ها.", "کتاب‌ها", "ketâb-hâ"],
+      ["Object marker", "The direct object marker is را.", "من کتاب را خواندم.", "man ketâb râ khândam"],
+      ["Present marker", "Many present-tense verbs use می.", "می‌روم", "miravam"],
+      ["Ezafe", "Ezafe links nouns and adjectives or possessors.", "کتابِ خوب", "ketâb-e khub"],
+      ["No grammatical gender", "Persian pronouns and nouns do not have masculine/feminine gender.", "او", "u"]
+    ];
+
+    const grammarFa = {
+      "Sentence order": "در فارسی ترتیب معمول جمله نهاد، مفعول، فعل است؛ هرچند برای تأکید یا سبک ادبی می‌توان جای اجزا را تغییر داد.",
+      "Plural": "پسوند ها رایج‌ترین نشانه جمع در فارسی امروز است و با بیشتر اسم‌ها به کار می‌رود.",
+      "Object marker": "نشانه را معمولاً پس از مفعول مستقیمِ معین یا مشخص می‌آید و به فهم ساخت جمله کمک می‌کند.",
+      "Present marker": "در بسیاری از فعل‌های زمان حال، پیشوند می همراه با بن مضارع و شناسه شخصی به کار می‌رود.",
+      "Ezafe": "اضافه پیوندی آوایی میان اسم و صفت، مضاف‌الیه یا عبارت توصیفی ایجاد می‌کند.",
+      "No grammatical gender": "در فارسی اسم‌ها و ضمیرها جنس دستوری مذکر و مؤنث ندارند.",
+      "Pronouns": "ضمیرهای فارسی شخص و شمار را نشان می‌دهند، اما جنسیت دستوری را نشان نمی‌دهند.",
+      "Noun Phrase Structure": "گروه اسمی فارسی معمولاً با هسته آغاز می‌شود و سپس صفت‌ها، مالک‌ها و توضیح‌ها با اضافه می‌آیند.",
+      "Noun phrase and ezafe": "در گروه اسمی فارسی، اضافه مهم‌ترین ابزار پیوند دادن اسم با صفت و مالک است.",
+      "Possession": "مالکیت می‌تواند با اضافه و مالک جداگانه یا با شناسه‌های ملکی چسبیده بیان شود.",
+      "Plural Marking": "جمع در فارسی با ها، ان و گاهی جمع‌های عربیِ وام‌گرفته ساخته می‌شود.",
+      "Definiteness": "فارسی حرف تعریف معادل the انگلیسی ندارد و معین بودن از بافت، را و نشانه‌های دیگر فهمیده می‌شود.",
+      "Indefiniteness": "ناشناختگی یا نکره بودن می‌تواند با یک، پسوند ی یا ترکیب هر دو بیان شود.",
+      "Indefinite marker": "پسوند ی می‌تواند اسم را نکره یا نامشخص کند.",
+      "Direct Object Marker": "را پس از کل گروه اسمی می‌آید و معمولاً مفعول مشخص را نشان می‌دهد.",
+      "Adjectives": "صفت‌های وابسته معمولاً پس از اسم و با اضافه می‌آیند؛ اما صفت خبری در جمله ساده بدون اضافه می‌آید.",
+      "Comparison": "تر برای صفت برتر و ترین برای صفت برترین به کار می‌رود.",
+      "Comparatives": "تر و ترین نشانه‌های اصلی سنجش و برتری در فارسی‌اند.",
+      "Clause Order": "در نثر معمول، فعل اغلب در پایان بند می‌آید و جمله را کامل می‌کند.",
+      "Present Stem And Present Tense": "بن مضارع برای ساخت حال، امر و بسیاری از ساخت‌های التزامی ضروری است.",
+      "Present tense": "زمان حال معمولاً با می، بن مضارع و شناسه ساخته می‌شود.",
+      "Past Stem And Simple Past": "بن ماضی معمولاً از حذف ن از مصدر به دست می‌آید و پایه زمان گذشته است.",
+      "Past tense": "بسیاری از صورت‌های گذشته از بن ماضی و شناسه‌های شخصی ساخته می‌شوند.",
+      "Perfect Forms": "صورت‌های کامل گذشته، رخداد گذشته را به نتیجه یا وضعیت کنونی پیوند می‌دهند.",
+      "Present perfect": "ماضی نقلی عملی کامل‌شده را با اثر یا ارتباطی با اکنون بیان می‌کند.",
+      "Progressive And Habitual Aspect": "می در فارسی اغلب نمود استمرار، عادت یا تکرار را نشان می‌دهد.",
+      "Future": "آینده رسمی با خواستن ساخته می‌شود، اما در گفتار روزمره زمان حال همراه با قید زمان بسیار رایج است.",
+      "Imperative": "امر معمولاً با ب و بن مضارع ساخته می‌شود و صورت منفی با ن می‌آید.",
+      "Negation": "نفی فعل با پیشوندهای منفی مانند نـ و نمیـ ساخته می‌شود.",
+      "Questions": "پرسش بله/خیر می‌تواند تنها با آهنگ جمله ساخته شود؛ آیا رسمی‌تر است.",
+      "Prepositions And Postpositions": "فارسی حرف اضافه‌هایی مانند به، از، در و با دارد و را یک پس‌نشانه مهم است.",
+      "Prepositions": "حرف اضافه‌های فارسی کوتاه‌اند، اما کاربردهای اصطلاحی فراوانی دارند.",
+      "Light Verb Constructions": "بخش بزرگی از فعل‌های رایج فارسی از اسم یا صفت همراه با فعل سبک ساخته می‌شوند.",
+      "Light verbs": "فعل‌های مرکب با فعل‌هایی مانند کردن، شدن، دادن و گرفتن بخش مهمی از فارسی امروز هستند.",
+      "Subjunctive": "التزامی پس از خواستن، باید، امکان، هدف و بسیاری از جمله‌های وابسته می‌آید.",
+      "Relative Clauses": "جمله‌های موصولی معمولاً با که می‌آیند و پس از اسمی قرار می‌گیرند که توصیف می‌شود.",
+      "Register And Colloquial Persian": "فارسی گفتاری صورت‌های کوتاه‌تر و واژگان متفاوتی دارد؛ فارسی نوشتاری معمولاً رسمی‌تر و محافظه‌کارتر است.",
+      "Colloquial reductions": "در گفتار روزمره بسیاری از واژه‌ها و فعل‌ها کوتاه‌تر تلفظ می‌شوند."
+    };
+
+    const vocabulary = {
+      elementary: [
+        ["سلام", "salâm", "hello", "سلام، حال شما چطور است؟", "salâm, hâl-e shomâ chetor ast?"],
+        ["خداحافظ", "khodâhâfez", "goodbye", "خداحافظ دوست من", "khodâhâfez dust-e man"],
+        ["مادر", "mâdar", "mother", "مادر من مهربان است.", "mâdar-e man mehrabân ast"],
+        ["پدر", "pedar", "father", "پدر در خانه است.", "pedar dar khâne ast"],
+        ["کتاب", "ketâb", "book", "این کتاب خوب است.", "in ketâb khub ast"],
+        ["خانه", "khâne", "house", "خانه بزرگ است.", "khâne bozorg ast"],
+        ["دوست", "dust", "friend", "او دوست من است.", "u dust-e man ast"],
+        ["آب", "âb", "water", "آب سرد است.", "âb sard ast"]
+      ],
+      intermediate: [
+        ["دانشگاه", "dâneshgâh", "university", "او در دانشگاه درس می‌خواند.", "u dar dâneshgâh dars mikhânad"],
+        ["سفر", "safar", "travel", "سفر به ایران جالب بود.", "safar be irân jâleb bud"],
+        ["فرهنگ", "farhang", "culture", "فرهنگ ایرانی غنی است.", "farhang-e irâni ghani ast"],
+        ["احساس", "ehsâs", "feeling", "احساس خوبی دارم.", "ehsâs-e khubi dâram"]
+      ],
+      advanced: [
+        ["فلسفه", "falsafe", "philosophy", "فلسفه موضوعی عمیق است.", "falsafe mozui amiq ast"],
+        ["ادبیات", "adabiyât", "literature", "ادبیات فارسی بسیار غنی است.", "adabiyât-e fârsi besyâr ghani ast"],
+        ["پیچیدگی", "pichidegi", "complexity", "پیچیدگی زبان طبیعی", "pichidegi-ye zabân-e tabii"],
+        ["معرفت", "marefat", "knowledge", "معرفت ارزشمند است.", "marefat arzeshmand ast"]
+      ]
+    };
+
+    const stories = {
+      elementary: [
+        ["Ali Goes to School", "علی به مدرسه می‌رود", "علی دانش‌آموز است.\nاو هر روز به مدرسه می‌رود.\nاو کتاب و دفتر دارد.\nمعلم او مهربان است.", "Ali is a student. He goes to school every day. He has a book and a notebook. His teacher is kind."],
+        ["My Family", "خانواده من", "من یک خانواده بزرگ دارم.\nپدرم پزشک است.\nمادرم معلم است.\nمن یک برادر و یک خواهر دارم.", "I have a large family. My father is a doctor. My mother is a teacher. I have one brother and one sister."]
+      ],
+      intermediate: [
+        ["A Trip to Shiraz", "سفر به شیراز", "تابستان گذشته به شیراز سفر کردم.\nاز باغ ارم و حافظیه دیدن کردم.\nمردم بسیار مهمان‌نواز بودند.", "Last summer I traveled to Shiraz. I visited Eram Garden and Hafez Tomb. The people were very hospitable."]
+      ],
+      advanced: [
+        ["The Value of Knowledge", "ارزش دانش", "دانش یکی از مهم‌ترین ابزارهای پیشرفت انسان است.\nجامعه‌ای که به دانش اهمیت می‌دهد، می‌تواند آینده‌ای روشن‌تر بسازد.", "Knowledge is one of the most important tools for human progress. A society that values knowledge can build a brighter future."]
+      ]
+    };
+
+    const quizQuestions = [
+      ["How many letters are in the Persian alphabet?", ["28", "30", "32", "36"], 2],
+      ["What does کتاب mean?", ["house", "friend", "book", "school"], 2],
+      ["Which letter represents 'sh'?", ["س", "ص", "ش", "ث"], 2],
+      ["Persian sentence order is usually:", ["SVO", "SOV", "VSO", "OVS"], 1],
+      ["What does سلام mean?", ["hello", "goodbye", "book", "friend"], 0],
+      ["What is the direct object marker in Persian?", ["می", "ها", "را", "به"], 2],
+      ["Which period came first?", ["Modern Persian", "Classical Persian", "Middle Persian", "Old Persian"], 3],
+      ["کتاب‌ها means:", ["book", "books", "library", "writer"], 1],
+      ["What does مادر mean?", ["father", "brother", "mother", "sister"], 2],
+      ["Which script was used for Old Persian?", ["Latin", "Cyrillic", "Cuneiform", "Pahlavi"], 2]
+    ];
+
+    const quizFa = {
+      "How many letters are in the Persian alphabet?": "الفبای فارسی چند حرف دارد؟",
+      "What does کتاب mean?": "معنی «کتاب» چیست؟",
+      "Which letter represents 'sh'?": "کدام حرف صدای «ش / sh» دارد؟",
+      "Persian sentence order is usually:": "ترتیب معمول جمله در فارسی چیست؟",
+      "What does سلام mean?": "معنی «سلام» چیست؟",
+      "What is the direct object marker in Persian?": "نشانه مفعول مستقیم در فارسی چیست؟",
+      "Which period came first?": "کدام دوره زودتر بوده است؟",
+      "کتاب‌ها means:": "«کتاب‌ها» یعنی چه؟",
+      "What does مادر mean?": "معنی «مادر» چیست؟",
+      "Which script was used for Old Persian?": "فارسی باستان با چه خطی نوشته می‌شد؟",
+      "Which modern standard of Persian is commonly written in Cyrillic?": "کدام گونه معیار فارسی معمولاً با خط سیریلیک نوشته می‌شود؟",
+      "Middle Persian is strongly associated with which empire?": "فارسی میانه بیشتر با کدام شاهنشاهی پیوند دارد؟",
+      "What does ezafe usually do?": "اضافه معمولاً چه کاری انجام می‌دهد؟",
+      "Which suffix is commonly used for plural nouns?": "کدام پسوند برای جمع بستن اسم‌ها رایج است؟",
+      "What does زبان‌شناسی mean?": "معنی «زبان‌شناسی» چیست؟",
+      "Which writing system is associated with Old Persian inscriptions?": "سنگ‌نوشته‌های فارسی باستان با چه خطی پیوند دارند؟"
+    };
+
+    let currentQuestion = 0;
+    let xp = 0;
+    let score = 0;
+    let totalAnswered = 0;
+    let activeUtterance = null;
+    let speechTimer = null;
+    let fallbackSpeechNoticeShown = false;
+
+    function getPersianVoice() {
+      const voices = speechSynthesis.getVoices ? speechSynthesis.getVoices() : [];
+      return voices.find(voice => /fa|persian|farsi/i.test(`${voice.lang} ${voice.name}`)) || null;
+    }
+
+    function speakOffline(text) {
+      if (!("speechSynthesis" in window)) return alert("Speech synthesis is not available in this browser.");
+      const cleanText = String(text || "").trim();
+      if (!cleanText) return;
+      clearTimeout(speechTimer);
+      speechSynthesis.cancel();
+      speechSynthesis.resume();
+      speechTimer = setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        activeUtterance = utterance;
+        utterance.lang = "fa-IR";
+        const voice = getPersianVoice();
+        if (voice) utterance.voice = voice;
+        utterance.rate = 0.82;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+        utterance.onend = () => {
+          if (activeUtterance === utterance) activeUtterance = null;
+        };
+        utterance.onerror = () => {
+          if (activeUtterance === utterance) activeUtterance = null;
+          speechSynthesis.cancel();
+          speechSynthesis.resume();
+        };
+        speechSynthesis.speak(utterance);
+      }, 80);
+    }
+
+    function speak(text) {
+      const cleanText = String(text || "").trim();
+      if (!cleanText) return;
+      if (!navigator.onLine) {
+        speakOffline(cleanText);
+        return;
+      }
+
+      clearTimeout(speechTimer);
+      if ("speechSynthesis" in window) speechSynthesis.cancel();
+
+      const audio = new Audio();
+      const encoded = encodeURIComponent(cleanText.slice(0, 180));
+      audio.src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=fa&q=${encoded}`;
+      audio.preload = "auto";
+      audio.onerror = () => {
+        if (!fallbackSpeechNoticeShown) {
+          fallbackSpeechNoticeShown = true;
+          console.info("Online Persian pronunciation was unavailable; using offline browser speech synthesis.");
+        }
+        speakOffline(cleanText);
+      };
+      audio.play().catch(() => speakOffline(cleanText));
+    }
+
+    function makeCard(front, back, searchableText = "") {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.dataset.search = searchableText.toLowerCase();
+      card.innerHTML = `<div class="card-inner"><div class="front">${front}</div><div class="back">${back}</div></div>`;
+      card.addEventListener("click", () => card.classList.toggle("flip"));
+      return card;
+    }
+
+    function renderTabs() {
+      const nav = document.getElementById("tabs");
+      nav.innerHTML = tabs.map(([id, label], i) => `<button class="tab ${i === 0 ? "active" : ""}" data-tab="${id}">${label}</button>`).join("");
+      nav.addEventListener("click", event => {
+        const btn = event.target.closest(".tab");
+        if (!btn) return;
+        document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab === btn));
+        document.querySelectorAll(".panel").forEach(panel => panel.classList.toggle("active", panel.id === btn.dataset.tab));
+        updateProgressPanel();
+      });
+    }
+
+    function renderAlphabet() {
+      const grid = document.getElementById("alphabetGrid");
+      grid.innerHTML = "";
+      alphabetData.forEach(([letter, name, sound, example, trans, meaning]) => {
+        const faName = letterNamesFa[letter] || letter;
+        const note = letterSoundNotes[letter] || "This letter has a stable consonant value in standard Persian. Practice it inside real words, because isolated letters may sound unnatural in text-to-speech.";
+        const front = `<div class="letter fa">${letter}</div><strong>${name} / <span class="fa">${faName}</span></strong><p class="small">Sound / صدا: ${sound}</p><button class="tool-btn" onclick="event.stopPropagation(); speak('${faName}')">Letter name / نام حرف</button>`;
+        const back = `<h3 class="fa">${example}</h3><p>${trans}</p><p>${meaning}</p><p class="fa">نمونه: ${example}</p><p class="small">${note}</p><button class="tool-btn" onclick="event.stopPropagation(); speak('${example}')">Example / نمونه</button>`;
+        grid.appendChild(makeCard(front, back, `${letter} ${name} ${sound} ${example} ${trans} ${meaning}`));
+      });
+    }
+
+    function renderSoundGrid(id, data) {
+      const grid = document.getElementById(id);
+      grid.innerHTML = "";
+      data.forEach(([symbol, ipa, example, trans, note]) => {
+        grid.appendChild(makeCard(`<h3>${symbol}</h3><p>${ipa}</p><p class="small">${note || ""}</p>`, `<h3 class="fa">${example}</h3><p>${trans}</p><p class="fa">برای شنیدن تلفظ، واژه نمونه را پخش کنید.</p><button class="tool-btn" onclick="event.stopPropagation(); speak('${example}')">Listen / پخش</button>`, `${symbol} ${ipa} ${example} ${trans} ${note || ""}`));
+      });
+    }
+
+    function renderGrammar() {
+      const grid = document.getElementById("grammarGrid");
+      grid.innerHTML = "";
+      grammar.forEach(([title, explanation, fa, trans, note]) => {
+        const box = document.createElement("div");
+        box.className = "box grammar-card";
+        const faExplanation = grammarFa[title] ? `<p class="fa">${grammarFa[title]}</p>` : "";
+        box.innerHTML = `<h3>${title}</h3><p>${explanation}</p>${faExplanation}<p class="fa">${fa}</p><p class="small">${trans}</p>${note ? `<p class="note">${note}</p>` : ""}`;
+        grid.appendChild(box);
+      });
+    }
+
+    function showVocabulary(level) {
+      const grid = document.getElementById("vocabGrid");
+      grid.dataset.level = level;
+      grid.innerHTML = "";
+      vocabulary[level].forEach(([word, trans, meaning, example, exampleTrans]) => {
+        const front = `<h2 class="fa">${word}</h2><p>${meaning}</p><button class="tool-btn" onclick="event.stopPropagation(); speak('${word}')">Listen</button>`;
+        const back = `<h3 class="fa">${example}</h3><p>${exampleTrans}</p><p><strong>${trans}</strong> - ${meaning}</p><button class="tool-btn" onclick="event.stopPropagation(); addFavorite('${word}')">Favorite / علاقه‌مندی</button>`;
+        grid.appendChild(makeCard(front, back, `${word} ${trans} ${meaning} ${example} ${exampleTrans}`));
+      });
+      filterCards("vocabSearch", "vocabGrid");
+    }
+
+    function loadStories(level) {
+      const container = document.getElementById("storyContainer");
+      container.innerHTML = "";
+      stories[level].forEach(([title, titleFa, persian, english]) => {
+        const div = document.createElement("div");
+        div.className = "story";
+        div.innerHTML = `<h3>${title}</h3><h3 class="fa">${titleFa}</h3><p class="fa">${persian.replace(/\n/g, "<br>")}</p><div class="controls"><button class="tool-btn">Read / پخش داستان</button><button class="tool-btn">Translation / ترجمه</button></div><p class="translation" hidden>${english}</p>`;
+        const [readBtn, toggleBtn] = div.querySelectorAll("button");
+        readBtn.addEventListener("click", () => { speak(persian); awardXP(5); });
+        toggleBtn.addEventListener("click", () => {
+          const translation = div.querySelector(".translation");
+          translation.hidden = !translation.hidden;
+          toggleBtn.textContent = translation.hidden ? "Translation / ترجمه" : "Hide / پنهان";
+        });
+        container.appendChild(div);
+      });
+    }
+
+    function loadQuestion() {
+      const [question, answers] = quizQuestions[currentQuestion];
+      document.getElementById("questionText").innerHTML = `${question}<br><span class="fa">${quizFa[question] || ""}</span>`;
+      document.getElementById("quizFeedback").textContent = "";
+      document.getElementById("quizFeedback").className = "feedback";
+      document.getElementById("answersContainer").innerHTML = answers.map((answer, index) => `<button class="option" onclick="checkAnswer(${index})">${answer}</button>`).join("");
+    }
+
+    function checkAnswer(selected) {
+      const correct = quizQuestions[currentQuestion][2];
+      const feedback = document.getElementById("quizFeedback");
+      totalAnswered += 1;
+      if (selected === correct) {
+        score += 1;
+        awardXP(10);
+        feedback.textContent = "Correct! / درست است!";
+        feedback.classList.add("good");
+      } else {
+        feedback.textContent = "Incorrect. Try the next one. / نادرست؛ پرسش بعدی را امتحان کنید.";
+        feedback.classList.add("bad");
+      }
+      saveProgress();
+      updateProgressPanel();
+    }
+
+    function nextQuestion() {
+      currentQuestion = (currentQuestion + 1) % quizQuestions.length;
+      loadQuestion();
+    }
+
+    function awardXP(amount) {
+      xp += amount;
+      saveProgress();
+      updateProgressPanel();
+    }
+
+    function updateProgressPanel() {
+      document.getElementById("xpValue").textContent = xp;
+      document.getElementById("scoreValue").textContent = score;
+      document.getElementById("answeredValue").textContent = totalAnswered;
+      document.getElementById("xpBar").style.width = `${Math.min(xp, 1000) / 10}%`;
+    }
+
+    function saveProgress() {
+      localStorage.setItem("persianProgress", JSON.stringify({xp, score, totalAnswered}));
+    }
+
+    function loadProgress() {
+      const saved = localStorage.getItem("persianProgress");
+      if (!saved) return;
+      try {
+        const data = JSON.parse(saved);
+        xp = Number(data.xp) || 0;
+        score = Number(data.score) || 0;
+        totalAnswered = Number(data.totalAnswered) || 0;
+      } catch {}
+    }
+
+    function exportProgress() {
+      const blob = new Blob([JSON.stringify({xp, score, totalAnswered}, null, 2)], {type: "application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "persian-progress.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function importProgress(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const data = JSON.parse(reader.result);
+        xp = Number(data.xp) || 0;
+        score = Number(data.score) || 0;
+        totalAnswered = Number(data.totalAnswered) || 0;
+        saveProgress();
+        updateProgressPanel();
+      };
+      reader.readAsText(file);
+    }
+
+    function resetProgress() {
+      xp = 0;
+      score = 0;
+      totalAnswered = 0;
+      saveProgress();
+      updateProgressPanel();
+    }
+
+    function addFavorite(word) {
+      const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+      if (!favorites.includes(word)) favorites.push(word);
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      alert(`${word} added to favorites / به علاقه‌مندی‌ها افزوده شد`);
+    }
+
+    function filterCards(inputId, gridId) {
+      const query = document.getElementById(inputId).value.trim().toLowerCase();
+      document.querySelectorAll(`#${gridId} .card`).forEach(card => {
+        card.style.display = card.dataset.search.includes(query) ? "" : "none";
+      });
+    }
+
+    function reviewRandomCard(gridId) {
+      const cards = [...document.querySelectorAll(`#${gridId} .card`)].filter(card => card.style.display !== "none");
+      if (!cards.length) return;
+      const card = cards[Math.floor(Math.random() * cards.length)];
+      card.scrollIntoView({behavior: "smooth", block: "center"});
+      card.classList.add("flip");
+    }
+
+    function toggleDark() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+
+    function loadDailyWord() {
+      const all = Object.values(vocabulary).flat();
+      const day = Math.floor(Date.now() / 86400000);
+      const [word, trans, meaning, example] = all[day % all.length];
+      document.getElementById("dailyWord").innerHTML = `<p class="fa" style="font-size:1.5rem">${word}</p><p>${trans} - ${meaning}</p><p class="fa">${example}</p>`;
+    }
+
+    function enhanceProfessionalContent() {
+      document.getElementById("home").innerHTML = `
+        <h2 class="section-title">Why Persian Matters / چرا فارسی مهم است</h2>
+        <div class="intro">
+          <div class="box">
+            <h3>A Language Of Memory, Imagination, And Civilization</h3>
+            <p>Persian is not only a modern language of daily life; it is also a long cultural archive. For more than a millennium it has carried poetry, philosophy, historical writing, science, statecraft, mysticism, music, and everyday storytelling across Iran, Afghanistan, Central Asia, the Caucasus, Anatolia, and the Indian subcontinent.</p>
+            <p>Learning Persian gives you access to a world where language is treated as art. Ordinary phrases can feel musical, poems are still quoted in conversation, and literature is part of public memory rather than a distant museum object.</p>
+          </div>
+          <div class="box fa">
+            <h3>زبانِ حافظه، خیال و تمدن</h3>
+            <p>فارسی تنها زبان گفت‌وگوی روزمره نیست؛ گنجینه‌ای فرهنگی و تاریخی است. این زبان بیش از هزار سال شعر، فلسفه، تاریخ‌نگاری، دانش، عرفان، موسیقی و روایت‌های زندگی را در ایران، افغانستان، آسیای میانه، قفقاز، آناتولی و شبه‌قاره هند حمل کرده است.</p>
+            <p>یادگیری فارسی راهی است برای ورود به جهانی که در آن زبان، هنر است؛ جهانی که شعر هنوز در گفت‌وگوی روزمره حضور دارد.</p>
+          </div>
+        </div>
+        <br>
+        <div class="grid">
+          <div class="box">
+            <h3>Literary Prestige</h3>
+            <p>Persian literature is one of the great literary traditions of the world. Ferdowsi's epic imagination, Rumi's mystical language, Hafez's lyric ambiguity, Saadi's ethical prose and verse, Attar's allegorical storytelling, and Khayyam's philosophical quatrains shaped readers far beyond Iran.</p>
+            <p class="fa">ادبیات فارسی یکی از سنت‌های بزرگ ادبی جهان است. تخیل حماسی فردوسی، زبان عرفانی مولوی، ایهام غزل‌های حافظ، نثر و شعر اخلاقی سعدی، روایت‌های تمثیلی عطار و رباعیات فلسفی خیام بر خوانندگان بسیاری فراتر از ایران اثر گذاشته‌اند.</p>
+          </div>
+          <div class="box">
+            <h3>Global Influence</h3>
+            <p>For centuries Persian functioned as a language of high culture and administration across large parts of Eurasia. Its vocabulary and literary models influenced Ottoman Turkish, Urdu, Hindi, Bengali, Punjabi, Armenian, Georgian, and other neighboring traditions.</p>
+            <p class="fa">فارسی در طی قرن‌ها زبان فرهنگ والا و دیوان‌سالاری در بخش‌های بزرگی از اوراسیا بود. واژگان و الگوهای ادبی آن بر ترکی عثمانی، اردو، هندی، بنگالی، پنجابی، ارمنی، گرجی و سنت‌های همسایه اثر گذاشت.</p>
+          </div>
+          <div class="box">
+            <h3>Modern Relevance</h3>
+            <p>Today Persian opens doors to contemporary literature, film, journalism, music, history, religious studies, diplomacy, migration studies, art history, linguistics, and regional analysis of Iran, Afghanistan, Tajikistan, and diaspora communities.</p>
+            <p class="fa">امروزه فارسی راهی برای شناخت ادبیات معاصر، سینما، روزنامه‌نگاری، موسیقی، تاریخ، مطالعات دینی، دیپلماسی، مهاجرت، تاریخ هنر، زبان‌شناسی و شناخت ایران، افغانستان، تاجیکستان و جوامع مهاجر است.</p>
+          </div>
+          <div class="box">
+            <h3>Joy Of Learning</h3>
+            <p>Persian rewards learners early. It has no grammatical gender, has a relatively regular sound system, and uses elegant patterns such as ezafe and compound verbs. Even simple sentences can quickly become expressive, poetic, and personal.</p>
+            <p class="fa">فارسی از همان آغاز به زبان‌آموز پاداش می‌دهد. جنس دستوری ندارد، نظام آوایی آن نسبتاً منظم است و ساخت‌هایی زیبا مانند اضافه و فعل‌های مرکب دارد. حتی جمله‌های ساده می‌توانند زود بیانگر، شاعرانه و شخصی شوند.</p>
+          </div>
+          <div class="box fa">
+            <h3>ادبیات فارسی</h3>
+            <p>از شاهنامه فردوسی تا غزل‌های حافظ و مولانا، از نثر سعدی تا داستان‌های عطار، فارسی زبانی است که تخیل، اخلاق، عرفان و زیبایی را در کنار هم پرورش داده است.</p>
+          </div>
+          <div class="box fa">
+            <h3>چرا یاد بگیریم؟</h3>
+            <p>فارسی برای شناخت تاریخ، فرهنگ، شعر، سینما، موسیقی، اندیشه، روابط منطقه‌ای و گفت‌وگو با فارسی‌زبانان جهان ارزشمند است. یادگیری آن هم سودمند است و هم لذت‌بخش.</p>
+          </div>
+        </div>
+        <br>
+        <div class="box source-list">
+          <h3>Complementary Data</h3>
+          <table>
+            <tr><th>Topic / موضوع</th><th>Data / داده</th><th>Meaning for learners / اهمیت برای زبان‌آموز</th></tr>
+            <tr><td>Speakers / گویشوران</td><td>About 130 million worldwide, including native and second-language Persian speakers.</td><td>Persian is not a small historical language; it is a living global language with large communities and diasporas.</td></tr>
+            <tr><td>Official status / جایگاه رسمی</td><td>Official in Iran as Persian, Afghanistan as Dari, and Tajikistan as Tajik.</td><td>Learning Persian connects three modern national standards and many regional varieties.</td></tr>
+            <tr><td>Language family / خانواده زبانی</td><td>Indo-European -> Indo-Iranian -> Iranian -> Western Iranian</td><td>Persian is historically related to many European and South Asian languages, while retaining its own Iranian identity.</td></tr>
+            <tr><td>Alphabet / الفبا</td><td>32 letters in the modern Persian alphabet, written right to left.</td><td>The script is visual, connected, and central to reading literature and culture.</td></tr>
+            <tr><td>Sound system / نظام آوایی</td><td>Commonly described with six vowels and about twenty-three consonant phonemes, with variation across Persian, Dari, and Tajik.</td><td>The pronunciation system is learnable, but learners must watch short unwritten vowels and letters that share the same sound.</td></tr>
+            <tr><td>Writing systems / خط‌ها</td><td>Perso-Arabic for Iranian Persian and Dari; Cyrillic for modern Tajik.</td><td>The script is part of cultural history, not only a technical alphabet.</td></tr>
+            <tr><td>Cultural domains / حوزه‌های فرهنگی</td><td>Poetry, historiography, Sufism, court culture, film, music, scholarship.</td><td>Persian is useful for both classical and modern cultural study.</td></tr>
+          </table>
+          <p class="fa">بر پایه داده‌های مرجع عمومی، فارسی حدود ۱۳۰ میلیون گویشور در جهان دارد. این زبان در ایران با نام فارسی، در افغانستان با نام دری و در تاجیکستان با نام تاجیکی جایگاه رسمی دارد. الفبای فارسی ۳۲ حرف دارد و نظام آوایی آن معمولاً با شش واکه و حدود بیست‌وسه همخوان توصیف می‌شود.</p>
+          <p class="small">Sources: Wikipedia articles on Persian language, Persian alphabet, and Persian phonology.</p>
+        </div>
+      `;
+
+      document.getElementById("sounds").innerHTML = `
+        <h2 class="section-title">Sounds And Pronunciation / آواها و تلفظ</h2>
+        <div class="box">
+          <h3>How Persian Pronunciation Works</h3>
+          <p>Persian pronunciation is generally learnable and regular, but the writing system does not normally show the three short vowels. This means that reading accurately requires learning each word with its pronunciation. Several Arabic-origin letters are preserved in spelling but have merged in modern Persian pronunciation: ث، س، ص are /s/; ز، ذ، ض، ظ are /z/; ت، ط are /t/; and ه، ح are /h/.</p>
+          <p class="fa">تلفظ فارسی معمولاً منظم و آموختنی است، اما در نوشتار عادی سه واکه کوتاه نوشته نمی‌شوند. بنابراین برای خواندن درست، باید هر واژه را همراه با تلفظ آن آموخت. برخی حروف عربی‌اصل در خط باقی مانده‌اند، اما در فارسی امروز هم‌آوا شده‌اند: ث، س، ص صدای /s/ دارند؛ ز، ذ، ض، ظ صدای /z/ دارند؛ ت و ط صدای /t/ دارند؛ و ه و ح صدای /h/ دارند.</p>
+          <p class="note">Audio note / نکته صوتی: when the browser is online, the app first tries an online Persian pronunciation audio source. If there is no internet access or the online audio is blocked, it automatically falls back to the browser's offline speech synthesis. The app sends real Persian words and letter names, which is more reliable than asking the browser to pronounce isolated symbols.</p>
+          <p class="fa note">اگر مرورگر به اینترنت دسترسی داشته باشد، برنامه نخست تلفظ آنلاین فارسی را امتحان می‌کند. اگر اینترنت در دسترس نباشد یا پخش آنلاین مسدود شود، برنامه خودکار از گفتار آفلاین مرورگر استفاده می‌کند.</p>
+        </div>
+        <br>
+        <h3>Vowels / واکه‌ها</h3>
+        <div id="vowelGrid" class="grid"></div>
+        <br>
+        <h3>Consonants And Merged Spellings / همخوان‌ها و حروف هم‌آوا</h3>
+        <div id="consonantGrid" class="grid"></div>
+      `;
+
+      document.getElementById("history").innerHTML = `
+        <h2 class="section-title">Historical Path / مسیر تاریخی زبان فارسی</h2>
+        <div class="box">
+          <h3>Professional Overview</h3>
+          <p>Persian is a Western Iranian language in the Iranian branch of the Indo-Iranian subdivision of Indo-European. In its modern standard forms it is pluricentric: Iranian Persian, Dari in Afghanistan, and Tajik in Tajikistan are closely related standards with different official histories, scripts, and regional norms.</p>
+          <p class="fa">فارسی زبانی ایرانی از شاخه هندواروپایی است. شکل‌های معیار امروزی آن در ایران، افغانستان و تاجیکستان با نام‌های فارسی، دری و تاجیکی شناخته می‌شوند.</p>
+          <p class="note">The historical notes below are paraphrased from Wikipedia articles and reshaped as course material, not copied as long encyclopedia passages.</p>
+        </div>
+        <div class="path">
+          <div class="path-step">
+            <h3>1. Proto-Indo-European background</h3>
+            <p>Persian begins, at the deepest reconstructed level, inside the Indo-European family. This does not mean Persian descends directly from a written ancient text; it means linguists compare related languages and reconstruct a shared prehistoric ancestor.</p>
+            <p class="fa">در عمیق‌ترین سطح بازسازی‌شده، فارسی در خانواده هندواروپایی قرار می‌گیرد. این به معنای وجود یک متن باستانی مستقیم نیست؛ بلکه نتیجه مقایسه زبان‌های خویشاوند و بازسازی یک نیای زبانی مشترک است.</p>
+          </div>
+          <div class="path-step">
+            <h3>2. Indo-Iranian and Iranian split</h3>
+            <p>The Indo-Iranian branch later divided into Indo-Aryan and Iranian groups. Persian belongs to the Iranian group, alongside languages such as Kurdish, Pashto, Balochi, Ossetian, and many historical Iranian languages.</p>
+            <p class="fa">شاخه هند و ایرانی بعدها به گروه‌های هندوآریایی و ایرانی تقسیم شد. فارسی در گروه زبان‌های ایرانی قرار دارد؛ در کنار زبان‌هایی مانند کردی، پشتو، بلوچی، آسی و بسیاری زبان‌های تاریخی ایرانی.</p>
+          </div>
+          <div class="path-step">
+            <h3>3. Old Persian, Achaemenid period, c. 550-330 BCE</h3>
+            <p>Old Persian is associated with the Achaemenid Empire and is best known from royal inscriptions written in Old Persian cuneiform. It is the earliest directly attested stage in the Persian line and represents the language of ancient Persis/Fars.</p>
+            <p><strong>Learning point:</strong> Old Persian was an inflected ancient language, much less like modern conversational Persian than a beginner might expect.</p>
+            <p class="fa">فارسی باستان با شاهنشاهی هخامنشی پیوند دارد و بیشتر از سنگ‌نوشته‌های شاهی به خط میخی فارسی باستان شناخته می‌شود. این مرحله کهن‌ترین صورت مستقیمِ گواهی‌شده در مسیر زبان فارسی است.</p>
+          </div>
+          <div class="path-step">
+            <h3>4. Middle Persian, Sasanian period, 224-651 CE</h3>
+            <p>Middle Persian, also called Pahlavi in many contexts, became the administrative, literary, and religious language of the Sasanian Empire. Its writing systems included Pahlavi scripts, which were historically connected with Aramaic writing practices.</p>
+            <p><strong>Learning point:</strong> Middle Persian shows a major simplification from Old Persian and is a bridge toward New Persian.</p>
+            <p class="fa">فارسی میانه، که در بسیاری زمینه‌ها پهلوی نامیده می‌شود، زبان اداری، ادبی و دینی شاهنشاهی ساسانی بود. این دوره پلی میان فارسی باستان و فارسی نو به شمار می‌آید.</p>
+          </div>
+          <div class="path-step">
+            <h3>5. Early New Persian, after the Islamic conquest</h3>
+            <p>After the Arab-Islamic conquest of Iran, Persian re-emerged in a new literary and administrative form written mainly in the Perso-Arabic script. Early New Persian continued the Middle Persian line while absorbing many Arabic loanwords and becoming a major language of culture.</p>
+            <p class="fa">پس از فتح ایران در دوره اسلامی، فارسی در صورتی تازه و عمدتاً با خط فارسی-عربی پدیدار شد. فارسی نو آغازین ادامه فارسی میانه بود، اما واژگان عربی بسیاری نیز پذیرفت و به زبان مهم فرهنگ و اداره تبدیل شد.</p>
+          </div>
+          <div class="path-step">
+            <h3>6. Classical Persian, medieval literary expansion</h3>
+            <p>Classical Persian became a prestigious language of poetry, scholarship, administration, and court culture across a wide region. Writers such as Rudaki, Ferdowsi, Saadi, Hafez, Rumi, Nezami, and Attar helped make Persian one of the great literary languages of Eurasia.</p>
+            <p class="fa">فارسی کلاسیک در گستره‌ای پهناور زبان شعر، دانش، دیوان‌سالاری و فرهنگ درباری شد. شاعرانی چون رودکی، فردوسی، سعدی، حافظ، مولوی، نظامی و عطار فارسی را به یکی از زبان‌های بزرگ ادبی اوراسیا بدل کردند.</p>
+          </div>
+          <div class="path-step">
+            <h3>7. Modern Persian, contemporary standards</h3>
+            <p>Modern Persian is used in education, media, literature, administration, and everyday life. Iranian Persian uses the Perso-Arabic script; Dari is also written in a Perso-Arabic script; Tajik is commonly written in Cyrillic. These standards remain closely related but differ in pronunciation, vocabulary, and sociopolitical history.</p>
+            <p class="fa">فارسی معاصر در آموزش، رسانه، ادبیات، اداره و زندگی روزمره به کار می‌رود. فارسی ایران و دری با خط فارسی-عربی نوشته می‌شوند و تاجیکی معمولاً با خط سیریلیک. این گونه‌ها نزدیک‌اند، اما در تلفظ، واژگان و تاریخ اجتماعی تفاوت‌هایی دارند.</p>
+          </div>
+        </div>
+        <br>
+        <div class="timeline-item">
+          <h3>Full Historical Path</h3>
+          <pre>Proto-Indo-European
+└── Proto-Indo-Iranian
+    └── Iranian
+        └── Western Iranian
+            └── Southwestern Iranian
+                └── Old Persian
+                    └── Middle Persian / Pahlavi
+                        └── Early New Persian / Dari
+                            └── Classical Persian
+                                └── Modern Persian
+                                    ├── Iranian Persian / Farsi
+                                    ├── Dari Persian
+                                    └── Tajik Persian</pre>
+        </div>
+        <br>
+        <div class="timeline-item">
+          <h3>Historical Reference Table</h3>
+          <table>
+            <tr><th>Stage</th><th>Approximate period</th><th>Political or cultural setting</th><th>Writing system</th><th>Why it matters</th></tr>
+            <tr><td>Old Persian</td><td>c. 550-330 BCE</td><td>Achaemenid Empire</td><td>Old Persian cuneiform</td><td>Earliest directly attested Persian stage.</td></tr>
+            <tr><td>Middle Persian</td><td>c. 224-651 CE</td><td>Sasanian Empire</td><td>Pahlavi and related scripts</td><td>Bridge from ancient Persian to New Persian.</td></tr>
+            <tr><td>Early New Persian</td><td>c. 8th-12th centuries</td><td>Post-Sasanian and Islamic-era Iranian culture</td><td>Perso-Arabic</td><td>Persian returns as a literary and administrative language.</td></tr>
+            <tr><td>Classical Persian</td><td>c. 10th-18th centuries</td><td>Iran, Central Asia, South Asia, and courts across Eurasia</td><td>Perso-Arabic</td><td>Golden age of Persian poetry and prose.</td></tr>
+            <tr><td>Modern Persian</td><td>19th century-present</td><td>Modern nation-states and global diaspora</td><td>Perso-Arabic and Cyrillic for Tajik</td><td>Contemporary standards: Farsi, Dari, and Tajik.</td></tr>
+          </table>
+        </div>
+        <br>
+        <div class="box source-list">
+          <h3>Wikipedia Sources</h3>
+          <p><a href="https://en.wikipedia.org/wiki/Persian_language" target="_blank" rel="noopener">Persian language</a> · <a href="https://en.wikipedia.org/wiki/Old_Persian" target="_blank" rel="noopener">Old Persian</a> · <a href="https://en.wikipedia.org/wiki/Middle_Persian" target="_blank" rel="noopener">Middle Persian</a> · <a href="https://en.wikipedia.org/wiki/New_Persian" target="_blank" rel="noopener">New Persian</a> · <a href="https://en.wikipedia.org/wiki/Persian_grammar" target="_blank" rel="noopener">Persian grammar</a> · <a href="https://en.wikipedia.org/wiki/Persian_vocabulary" target="_blank" rel="noopener">Persian vocabulary</a></p>
+        </div>
+      `;
+
+      document.getElementById("grammar").innerHTML = `
+        <h2 class="section-title">Descriptive Grammar / دستور توصیفی</h2>
+        <div class="box">
+          <h3>How This Grammar Section Is Organized</h3>
+          <p>This section follows the descriptive spirit of standard Persian grammar references: it explains how Persian is actually structured and used, rather than presenting only translation rules. The focus is on noun phrases, ezafe, object marking, tense and aspect, compound verbs, clause structure, register, and spoken-written variation.</p>
+          <p class="fa">این بخش با رویکرد دستور توصیفی تنظیم شده است: هدف آن توضیح ساختار واقعی فارسی در کاربرد است، نه فقط ارائه چند قاعده ترجمه‌ای. تمرکز بر گروه اسمی، اضافه، نشانه مفعول، زمان و نمود، فعل‌های مرکب، ساخت جمله و تفاوت گفتار و نوشتار است.</p>
+          <p class="note">Guiding references include the descriptive tradition represented by works such as Lazard's grammar of Persian, Windfuhr and Perry's Persian grammar descriptions, and modern pedagogical grammars such as Mace. The explanations here are original course notes, not copied passages.</p>
+        </div>
+        <br>
+        <div id="grammarGrid" class="grid"></div>
+      `;
+
+      grammar.push(
+        ["Pronouns", "Persian personal pronouns distinguish person and number, but not grammatical gender. The third-person او may refer to 'he', 'she', or a respected 'person' depending on context; آن is also used for things and sometimes persons in older or formal styles.", "من، تو، او، ما، شما، ایشان، آنها", "man, to, u, mâ, shomâ, ishân, ânhâ", "Descriptive grammars treat Persian as gender-neutral in the nominal and pronominal system; social distance is often expressed through شما and ایشان rather than gender."],
+        ["Noun Phrase Structure", "A basic Persian noun phrase usually places the head noun first, followed by modifiers connected by ezafe. The order often runs noun + adjective + possessor + additional descriptive phrase.", "خانهٔ بزرگِ دوستِ قدیمیِ من", "khâne-ye bozorg-e dust-e qadimi-ye man", "This head-initial noun phrase pattern is central to reading Persian prose because long chains can be built through repeated ezafe links."],
+        ["Ezafe", "Ezafe is an unstressed linking vowel, usually pronounced -e after consonants and -ye after vowels. It joins nouns to adjectives, possessors, titles, and many explanatory complements.", "کتابِ خوبِ استاد", "ketâb-e khub-e ostâd", "In writing, ezafe is often not fully marked, so learners must infer it from structure. It is one of the key descriptive features of Persian syntax."],
+        ["Possession", "Possession can be analytic, using ezafe plus a possessor, or synthetic, using enclitic possessive endings. The analytic form is clearer and more flexible; the enclitic form is compact and common in speech.", "کتابِ من / کتابم / کتابتان", "ketâb-e man / ketâbam / ketâbetân", "Possessive endings attach after many nouns and can express my, your, his/her, our, your plural/formal, and their."],
+        ["Plural Marking", "The productive plural suffix ها is widely used with most nouns. The suffix ان occurs with many human nouns and in more formal or lexicalized patterns. Arabic plurals also survive in borrowed vocabulary.", "کتاب‌ها، دانشجویان، آثار", "ketâb-hâ, dâneshjuyân, âsâr", "Modern descriptive accounts emphasize that plural choice depends on animacy, register, lexical history, and style."],
+        ["Definiteness", "Persian has no definite article equivalent to English 'the'. Definiteness is inferred from context, specificity, discourse status, demonstratives, and the object marker را.", "کتاب روی میز است. کتاب را برداشتم.", "ketâb ru-ye miz ast. ketâb râ bardâshtam", "A bare noun can be definite, generic, or indefinite depending on sentence context."],
+        ["Indefiniteness", "Indefiniteness can be expressed with یک, the suffix ی, or both together. The suffix ی often marks 'a certain' or non-specific reference in narrative and descriptive prose.", "یک کتاب خریدم. کتابی خریدم.", "yek ketâb kharidam. ketâbi kharidam", "The difference is not always identical to English 'a/an'; it is tied to specificity and discourse focus."],
+        ["Direct Object Marker", "The postposition را marks many definite or specific direct objects. It follows the entire noun phrase, not merely the noun.", "کتابِ خوبِ تو را خواندم.", "ketâb-e khub-e to râ khândam", "را is one of the strongest clues for sentence parsing because it identifies the object before the verb arrives."],
+        ["Adjectives", "Attributive adjectives normally follow the noun with ezafe, while predicative adjectives appear after the subject without ezafe in simple clauses.", "مردِ مهربان / مرد مهربان است.", "mard-e mehrabân / mard mehrabân ast", "Persian adjective order is usually easier than English for learners once ezafe becomes automatic."],
+        ["Comparison", "Comparatives are usually formed with تر and superlatives with ترین. Superlatives can appear before or after nouns depending on construction and style.", "بهتر، بهترین، بزرگ‌تر، بزرگ‌ترین شهر", "behtar, behtarin, bozorg-tar, bozorg-tarin shahr", "Some high-frequency adjectives have special forms, such as خوب -> بهتر."],
+        ["Clause Order", "Persian is commonly described as SOV: subject, object, verb. However, word order is flexible because information structure, emphasis, topicalization, and poetry can move elements.", "من امروز کتاب را خواندم.", "man emruz ketâb râ khândam", "The finite verb normally anchors the end of the clause, especially in neutral written prose."],
+        ["Present Stem And Present Tense", "The present indicative is typically built with می + present stem + personal ending. The present stem must often be learned separately from the infinitive.", "می‌نویسم، می‌نویسی، می‌نویسد", "minevisam, minevisi, minevisad", "The present stem is also used in subjunctives and imperatives, so it is a core unit of Persian verb learning."],
+        ["Past Stem And Simple Past", "The past stem is usually obtained by removing ن from the infinitive. Simple past forms add personal endings to the past stem, except the third-person singular often has no ending.", "نوشتن -> نوشتم، نوشتی، نوشت", "neveshtan -> neveshtam, neveshti, nevesht", "This system is comparatively regular, but common verbs may have unrelated present and past stems."],
+        ["Perfect Forms", "Perfect forms use the past participle plus forms of بودن or enclitic endings. They connect past events to present relevance, experience, or resulting state.", "رفته‌ام، دیده‌ایم، نوشته‌اند", "rafte-am, dide-im, neveshte-and", "The Persian perfect is especially important in narrative, biography, and formal prose."],
+        ["Progressive And Habitual Aspect", "The prefix می marks habitual, progressive, or imperfective meaning depending on context. Spoken Persian may also use داشتن for progressive action.", "دارم می‌نویسم.", "dâram minevisam", "Aspect is more important than a simple English tense label; می often describes ongoing or repeated action."],
+        ["Future", "Formal future uses forms of خواستن plus a shortened infinitive. In everyday Persian, future meaning is often expressed by the present tense plus time adverbs.", "خواهم رفت / فردا می‌روم", "khâham raft / fardâ miravam", "The formal future is common in writing and formal speech, while the present-for-future is very common conversationally."],
+        ["Imperative", "Commands often use ب + present stem, but negative commands use ن and some verbs have special common forms.", "برو، بخوان، ننویس", "boro, bekhân, nanevis", "Politeness changes the form: بفرمایید and لطفاً are common in respectful instructions."],
+        ["Negation", "Verbal negation is formed with negative prefixes such as نـ and نمیـ, depending on tense and aspect. Nominal negation often uses نیست.", "نمی‌دانم. این کتاب نیست.", "nemidânam. in ketâb nist", "The negative prefix attaches to the verb complex, so compound verbs require attention."],
+        ["Questions", "Yes/no questions may be formed by intonation alone; آیا is more formal and written. Question words usually appear in the relevant position in the sentence rather than forcing English-style inversion.", "کجا می‌روی؟ آیا فارسی می‌دانی؟", "kojâ miravi? âyâ fârsi midâni?", "Persian does not require subject-auxiliary inversion like English."],
+        ["Prepositions And Postpositions", "Persian has prepositions such as به، از، در، با and also the important postposition را. Many prepositional phrases are extended with ezafe constructions.", "از خانه به دانشگاه رفتم.", "az khâne be dâneshgâh raftam", "Prepositions are compact, but their idiomatic use is one of the main advanced learning tasks."],
+        ["Light Verb Constructions", "Many Persian verbs are compounds made from a noun, adjective, or prepositional element plus a light verb such as کردن، شدن، دادن، زدن، خوردن، داشتن.", "تصمیم گرفتن، کمک کردن، تمام شدن", "tasmim gereftan, komak kardan, tamâm shodan", "Descriptive grammars often treat compound verbs as central to modern Persian word formation and verbal expression."],
+        ["Subjunctive", "The subjunctive is used after expressions of desire, obligation, possibility, purpose, and many subordinate clauses. It typically uses ب + present stem + ending, though forms vary.", "می‌خواهم بروم. باید بخوانی.", "mikhâham beravam. bâyad bekhâni", "The subjunctive is essential for natural Persian beyond beginner statements."],
+        ["Relative Clauses", "Relative clauses are commonly introduced by که and follow the noun they describe. The head noun remains in the main clause, while که opens the descriptive clause.", "کتابی که خواندم جالب بود.", "ketâbi ke khândam jâleb bud", "که is one of the most frequent connectors in Persian prose."],
+        ["Register And Colloquial Persian", "Spoken Persian regularly reduces vowels and endings, shortens verb forms, and uses colloquial vocabulary. Written Persian remains more conservative.", "می‌روم -> می‌رم، خانه -> خونه", "miravam -> miram, khâne -> khune", "A professional learner should recognize both written standard and everyday spoken forms."]
+      );
+
+      vocabulary.elementary.push(
+        ["بله", "bale", "yes", "بله، من فارسی می‌خوانم.", "bale, man fârsi mikhânam"],
+        ["نه", "na", "no", "نه، نمی‌دانم.", "na, nemidânam"],
+        ["لطفاً", "lotfan", "please", "لطفاً آهسته صحبت کنید.", "lotfan âheste sohbat konid"],
+        ["ممنون", "mamnun", "thank you", "خیلی ممنون.", "kheyli mamnun"],
+        ["صبح", "sobh", "morning", "صبح بخیر.", "sobh bekheyr"],
+        ["شب", "shab", "night", "شب آرام است.", "shab ârâm ast"],
+        ["نان", "nân", "bread", "نان تازه است.", "nân tâze ast"],
+        ["چای", "chây", "tea", "چای داغ است.", "chây dâgh ast"],
+        ["سیب", "sib", "apple", "سیب قرمز است.", "sib qermez ast"],
+        ["مدرسه", "madrese", "school", "مدرسه نزدیک است.", "madrese nazdik ast"],
+        ["دفتر", "daftar", "notebook / office", "دفتر روی میز است.", "daftar ru-ye miz ast"],
+        ["میز", "miz", "table / desk", "میز کوچک است.", "miz kuchek ast"]
+      );
+
+      vocabulary.intermediate.push(
+        ["تاریخ", "târikh", "history", "تاریخ ایران طولانی است.", "târikh-e irân tulâni ast"],
+        ["زبان", "zabân", "language", "زبان فارسی زیباست.", "zabân-e fârsi zibâst"],
+        ["نوشتن", "neveshtan", "to write", "من نامه می‌نویسم.", "man nâme minevisam"],
+        ["خواندن", "khândan", "to read", "او شعر می‌خواند.", "u sher mikhânad"],
+        ["پرسیدن", "porsidan", "to ask", "سؤال خوبی پرسیدی.", "soâl-e khubi porsidi"],
+        ["یاد گرفتن", "yâd gereftan", "to learn", "من فارسی یاد می‌گیرم.", "man fârsi yâd migiram"],
+        ["اداره", "edâre", "office / administration", "او در اداره کار می‌کند.", "u dar edâre kâr mikonad"],
+        ["جامعه", "jâme'e", "society", "جامعه تغییر می‌کند.", "jâme'e taghyir mikonad"],
+        ["هنر", "honar", "art", "هنر برای فرهنگ مهم است.", "honar barâye farhang mohem ast"],
+        ["شعر", "sher", "poetry", "شعر فارسی مشهور است.", "sher-e fârsi mashhur ast"],
+        ["معنی", "ma'ni", "meaning", "معنی این واژه چیست؟", "ma'ni-ye in vâzhe chist?"],
+        ["گفت‌وگو", "goftogu", "conversation", "گفت‌وگو مفید بود.", "goftogu mofid bud"]
+      );
+
+      vocabulary.advanced.push(
+        ["زبان‌شناسی", "zabânshenâsi", "linguistics", "زبان‌شناسی ساختار زبان را بررسی می‌کند.", "zabânshenâsi sâkhtâr-e zabân râ barrasi mikonad"],
+        ["ریشه‌شناسی", "rishe-shenâsi", "etymology", "ریشه‌شناسی واژه‌ها جالب است.", "rishe-shenâsi-ye vâzhehâ jâleb ast"],
+        ["دستور زبان", "dastur-e zabân", "grammar", "دستور زبان الگوهای جمله را توضیح می‌دهد.", "dastur-e zabân olguhâ-ye jomle râ towzih midahad"],
+        ["واژه‌نامه", "vâzhe-nâme", "dictionary", "واژه‌نامه به یادگیری کمک می‌کند.", "vâzhe-nâme be yâdgiri komak mikonad"],
+        ["میراث", "mirâs", "heritage", "زبان بخشی از میراث فرهنگی است.", "zabân bakhshi az mirâs-e farhangi ast"],
+        ["تمدن", "tamaddon", "civilization", "تمدن‌های کهن آثار زیادی دارند.", "tamaddon-hâ-ye kohan âsâr-e ziâdi dârand"],
+        ["دیوان", "divân", "collected poems", "دیوان حافظ بسیار مشهور است.", "divân-e hâfez besyâr mashhur ast"],
+        ["حماسه", "hamâse", "epic", "شاهنامه یک حماسه بزرگ است.", "shâhnâme yek hamâse-ye bozorg ast"],
+        ["نوآوری", "noâvari", "innovation", "نوآوری در آموزش مهم است.", "noâvari dar âmuzesh mohem ast"],
+        ["هویت", "hoviyyat", "identity", "زبان با هویت پیوند دارد.", "zabân bâ hoviyyat peyvand dârad"],
+        ["گستره", "gostare", "domain / range", "گستره زبان فارسی وسیع بود.", "gostare-ye zabân-e fârsi vasi bud"],
+        ["دگرگونی", "degarguni", "transformation", "زبان در طول زمان دگرگون می‌شود.", "zabân dar tul-e zamân degargun mishavad"]
+      );
+
+      quizQuestions.push(
+        ["Which modern standard of Persian is commonly written in Cyrillic?", ["Dari", "Tajik", "Iranian Persian", "Old Persian"], 1],
+        ["Middle Persian is strongly associated with which empire?", ["Achaemenid", "Sasanian", "Ottoman", "Mughal"], 1],
+        ["What does ezafe usually do?", ["Marks future tense", "Links nouns with modifiers", "Shows negation", "Marks plural only"], 1],
+        ["Which suffix is commonly used for plural nouns?", ["را", "ها", "می", "تر"], 1],
+        ["What does زبان‌شناسی mean?", ["history", "linguistics", "poetry", "heritage"], 1],
+        ["Which writing system is associated with Old Persian inscriptions?", ["Cuneiform", "Cyrillic", "Latin", "Greek"], 0]
+      );
+    }
+
+    function init() {
+      if (localStorage.getItem("darkMode") === "true") document.body.classList.add("dark");
+      enhanceProfessionalContent();
+      renderTabs();
+      renderAlphabet();
+      renderSoundGrid("vowelGrid", vowels);
+      renderSoundGrid("consonantGrid", consonants);
+      renderGrammar();
+      showVocabulary("elementary");
+      loadStories("elementary");
+      loadQuestion();
+      loadProgress();
+      updateProgressPanel();
+      loadDailyWord();
+      document.getElementById("alphabetSearch").addEventListener("input", () => filterCards("alphabetSearch", "alphabetGrid"));
+      document.getElementById("vocabSearch").addEventListener("input", () => filterCards("vocabSearch", "vocabGrid"));
+    }
+
+    init();
+  </script>
+</body>
+</html>
+"""
+
+output_path = Path("persian_learning_app.html")
+output_path.write_text(html, encoding="utf-8")
+print(f"Created {output_path.resolve()}")
+
+try:
+    from google.colab import files
+    files.download(str(output_path))
+except Exception:
+    pass
